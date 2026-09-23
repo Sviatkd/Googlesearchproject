@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Reform Project</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="ReformConSearchbreaks_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ReformConSearchbreaks_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="ReformConSearchbreaks_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="ReformConSearchbreaks_files/libs/quarto-html/popper.min.js"></script>
+<script src="ReformConSearchbreaks_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ReformConSearchbreaks_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ReformConSearchbreaks_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ReformConSearchbreaks_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ReformConSearchbreaks_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ReformConSearchbreaks_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ReformConSearchbreaks_files/libs/bootstrap/bootstrap-215b371544c282197b31c8aa00ce3677.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Reform Project</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>import the data and use janitor to clean names</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sandwich)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tseries)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(strucchange)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Attaching package: 'strucchange'
+
+The following object is masked from 'package:stringr':
+
+    boundary</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stargazer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>This is lavaan 0.7-2
+lavaan is FREE software! Please report any bugs.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load time_series_GB_20040101_0000_20260422_0807 data</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>time_series_GB_20040101_0000_20260422_0807 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"c:/Users/User/Downloads/time_series_GB_20040101-0000_20260422-0807.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 268 Columns: 9
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl  (8): Immigration, Reform UK, Labour Party, Conservative Party, Scottish...
+date (1): Time
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> time_series_GB_20040101_0000_20260422_0807 <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Time =</span> <span class="fu">ymd</span>(Time))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">=</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(data_clean)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>reform_uk <span class="ot">=</span> time_series_GB_20040101_0000_20260422_0807<span class="sc">$</span><span class="st">`</span><span class="at">Reform UK</span><span class="st">`</span><span class="sc">+</span>time_series_GB_20040101_0000_20260422_0807<span class="sc">$</span><span class="st">`</span><span class="at">UK Independence Party</span><span class="st">`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>do a preliminary structural break check on the immigration time series, we are going to be using pre defined dates though</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(data_clean<span class="sc">$</span>immigration<span class="sc">~</span><span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     Optimal (m+1)-segment partition: 
+
+Call:
+breakpoints.formula(formula = data_clean$immigration ~ 1)
+
+Breakpoints at observation number:
+                         
+m = 1   57               
+m = 2   57            228
+m = 3   57        162 228
+m = 4   40 80     162 228
+m = 5   40 80 120 162 228
+
+Corresponding to breakdates:
+                                                                               
+m = 1   0.212686567164179                                                      
+m = 2   0.212686567164179                                                      
+m = 3   0.212686567164179                                     0.604477611940298
+m = 4   0.149253731343284 0.298507462686567                   0.604477611940298
+m = 5   0.149253731343284 0.298507462686567 0.447761194029851 0.604477611940298
+                         
+m = 1                    
+m = 2   0.850746268656716
+m = 3   0.850746268656716
+m = 4   0.850746268656716
+m = 5   0.850746268656716
+
+Fit:
+                                 
+m   0    1    2    3    4    5   
+RSS 8475 6026 3562 3365 3270 3180
+BIC 1697 1617 1487 1483 1487 1491</code></pre>
+</div>
+</div>
+<p>define break dummies using known immigration related topics such as brexit referendum</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> data_clean <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">breakdBpl =</span> <span class="fu">ifelse</span>(time <span class="sc">&gt;</span> <span class="fu">as.Date</span>(<span class="st">"2019-04-01"</span>), <span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># Reform UK founded small boatscrisis# </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">breakpukip=</span> <span class="fu">ifelse</span>(time<span class="sc">&gt;</span><span class="fu">as.Date</span>(<span class="st">"2015-05-01"</span>),<span class="dv">1</span>,<span class="dv">0</span>),    <span class="co">#Brexit #</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">breakpukipl=</span> <span class="fu">ifelse</span>(time<span class="sc">&gt;</span><span class="fu">as.Date</span>(<span class="st">"2012-01-01"</span>),<span class="dv">1</span>,<span class="dv">0</span>))  <span class="co"># Hostile Enviroment Policy# </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>pre define immigration and inflation break coefs</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">=</span> data_clean <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Refbreakim =</span> immigration<span class="sc">*</span>breakdBpl,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">Brexitbreakim =</span> immigration<span class="sc">*</span>breakpukip,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="at">Hostilebreakim =</span> immigration<span class="sc">*</span>breakpukipl)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">=</span> data_clean <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Refbreakinf =</span> inflation<span class="sc">*</span>breakdBpl,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="at">Brexitbreakinf =</span> inflation<span class="sc">*</span>breakpukip,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="at">Hostilebreakinf =</span> inflation<span class="sc">*</span>breakpukipl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>define simple independent ols models</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>breakmodel1im <span class="ot">=</span> <span class="fu">lm</span>(reform_uk<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>breakmodel2im <span class="ot">=</span> <span class="fu">lm</span>(conservative_party<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>breakmodel3im <span class="ot">=</span> <span class="fu">lm</span>(labour_party<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>breakmodel4im <span class="ot">=</span> <span class="fu">lm</span>(liberal_democrats<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>define a Seemingly Unrelated Regressions model structure</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sur_model_imm <span class="ot">=</span> <span class="st">'</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="st">#Outcome Regressions with breakpoints#</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~time+breakdBpl+breakpukip+breakpukipl+ b1r*immigration + b2r*Refbreakim + b3r*Brexitbreakim + b4r*Hostilebreakim</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~time+breakdBpl+breakpukip+breakpukipl + b1c*immigration + b2c*Refbreakim + b3c*Brexitbreakim + b4c*Hostilebreakim</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~time+breakdBpl+breakpukip+breakpukipl + b1l*immigration + b2l*Refbreakim + b3l*Brexitbreakim+ b4l*Hostilebreakim</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="st">liberal_democrats~time+breakdBpl+breakpukip+breakpukipl + b1d*immigration + b2d*Refbreakim + b3d*Brexitbreakim + b4d*Hostilebreakim</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="st">#The Covariance Structure of the Seemingly Unrelated Regressions#</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~~conservative_party+labour_party+liberal_democrats</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~~labour_party+liberal_democrats</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~~liberal_democrats</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="st">#Contrasts#</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_con := (b2r+b3r+b4r)-(b2c+b3c+b4c) #How much larger are slopes after breaks between Reform and Conservatives </span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lab := (b2c+b3c+b4c)-(b2l+b3l+b4l) # How much larger are slopes between Conservatives and Labour</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="st">diff_lab_lib := (b2l+b3l+b4l)-(b2d+b3d+b4d) # Between Labour and Lib Dem </span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lib := (b2c+b3c+b4c)-(b2d+b3d+b4d) # Between Conservatives and Lib dems </span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_main := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) # How different is the gap between reform and conservatives compared to conservatives and labour</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>fit a SUR</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fitsurimm <span class="ot">=</span> <span class="fu">sem</span>(sur_model_imm,<span class="at">data=</span>data_clean,<span class="at">se=</span><span class="st">"bootstrap"</span>,<span class="at">ncpus=</span><span class="dv">12</span>,<span class="at">bootstrap=</span><span class="dv">2000</span>,<span class="at">parallel=</span><span class="st">"snow"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fitsurimm,<span class="at">ci=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.7-2 ended normally after 182 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        42
+
+  Number of observations                           268
+
+Model Test User Model:
+                                                      
+  Test statistic                                 0.000
+  Degrees of freedom                                 0
+
+Parameter Estimates:
+
+  Standard errors                            Bootstrap
+  Number of requested bootstrap draws             2000
+  Number of successful bootstrap draws            2000
+
+Regressions:
+                       Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
+  reform_uk ~                                                            
+    time                     0.001    0.001    0.476    0.634      -0.002
+    brekdBpl                -4.136    2.824   -1.465    0.143     -10.902
+    breakpkp                53.399   16.177    3.301    0.001      17.240
+    brekpkpl               -53.999   15.756   -3.427    0.001     -89.037
+    immigrtn (b1r)           0.140    0.180    0.778    0.436      -0.230
+    Refbrekm (b2r)           0.243    0.229    1.063    0.288      -0.122
+    Brxtbrkm (b3r)          -4.885    1.391   -3.512    0.000      -7.982
+    Hstlbrkm (b4r)           4.992    1.402    3.560    0.000       1.753
+  conservative_party ~                                                   
+    time                    -0.000    0.001   -0.135    0.893      -0.003
+    brekdBpl                 5.685    4.113    1.382    0.167       0.628
+    breakpkp                34.143   15.098    2.261    0.024      -2.174
+    brekpkpl               -29.842   13.881   -2.150    0.032     -44.936
+    immigrtn (b1c)           0.220    0.240    0.915    0.360      -0.243
+    Refbrekm (b2c)          -0.355    0.404   -0.878    0.380      -1.466
+    Brxtbrkm (b3c)          -2.547    1.228   -2.074    0.038      -3.824
+    Hstlbrkm (b4c)           2.479    1.197    2.071    0.038      -0.331
+  labour_party ~                                                         
+    time                    -0.000    0.002   -0.253    0.800      -0.004
+    brekdBpl                 9.223    5.820    1.585    0.113      -0.145
+    breakpkp                33.963   15.983    2.125    0.034      -5.375
+    brekpkpl               -31.959   13.817   -2.313    0.021     -47.679
+    immigrtn (b1l)           0.272    0.336    0.809    0.418      -0.424
+    Refbrekm (b2l)          -0.582    0.589   -0.989    0.323      -2.104
+    Brxtbrkm (b3l)          -2.229    1.263   -1.765    0.078      -3.686
+    Hstlbrkm (b4l)           2.796    1.226    2.281    0.023      -0.207
+  liberal_democrats ~                                                    
+    time                     0.000    0.001    0.091    0.927      -0.001
+    brekdBpl                 2.090    1.567    1.334    0.182      -0.464
+    breakpkp                12.953    5.317    2.436    0.015      -0.776
+    brekpkpl               -12.129    4.694   -2.584    0.010     -17.531
+    immigrtn (b1d)           0.156    0.152    1.022    0.307      -0.131
+    Refbrekm (b2d)          -0.140    0.160   -0.877    0.381      -0.563
+    Brxtbrkm (b3d)          -1.036    0.403   -2.569    0.010      -1.460
+    Hstlbrkm (b4d)           0.979    0.422    2.317    0.020      -0.126
+ ci.upper   
+            
+       0.003
+       0.320
+      88.906
+     -16.980
+       0.482
+       0.787
+      -1.660
+       8.106
+            
+       0.002
+      17.789
+      51.603
+       2.615
+       0.707
+       0.212
+       0.410
+       3.815
+            
+       0.003
+      23.580
+      54.055
+       2.420
+       0.921
+       0.350
+       0.894
+       4.277
+            
+       0.002
+       6.119
+      19.469
+       0.128
+       0.485
+       0.096
+       0.054
+       1.513
+
+Covariances:
+                        Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
+ .reform_uk ~~                                                            
+   .conservtv_prty           10.150    2.782    3.649    0.000       4.560
+   .labour_party             22.916    9.469    2.420    0.016       6.714
+   .liberal_dmcrts            8.408    2.416    3.480    0.001       3.795
+ .conservative_party ~~                                                   
+   .labour_party             54.498   21.975    2.480    0.013      16.277
+   .liberal_dmcrts           17.114    5.251    3.259    0.001       7.034
+ .labour_party ~~                                                         
+   .liberal_dmcrts           25.590    7.961    3.214    0.001      10.257
+ ci.upper   
+            
+      15.658
+      43.474
+      13.201
+            
+      99.905
+      27.144
+            
+      41.803
+
+Variances:
+                   Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
+   .reform_uk           28.855   10.119    2.852    0.004      10.595
+   .conservtv_prty      41.656   15.731    2.648    0.008      14.291
+   .labour_party       107.269   40.737    2.633    0.008      33.994
+   .liberal_dmcrts      11.008    2.982    3.691    0.000       5.185
+ ci.upper   
+      49.269
+      72.965
+     190.023
+      17.074
+
+Defined Parameters:
+                   Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
+    diff_ref_con         0.773    0.339    2.280    0.023       0.126
+    diff_con_lab        -0.408    0.281   -1.452    0.146      -1.002
+    diff_lab_lib         0.183    0.337    0.543    0.587      -0.409
+    diff_con_lib        -0.225    0.184   -1.225    0.221      -0.578
+    diff_ref_main        1.181    0.456    2.590    0.010       0.333
+ ci.upper   
+       1.479
+       0.114
+       0.891
+       0.153
+       2.099</code></pre>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

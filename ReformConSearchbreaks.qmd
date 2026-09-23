@@ -1,0 +1,87 @@
+---
+title: "Reform Project"
+format: html
+---
+import the data and use janitor to clean names
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(sandwich)
+library(tseries)
+library(tidyverse)
+library(lubridate)
+library(strucchange)
+library(stargazer)
+library(lavaan)
+library(readr)
+# Load time_series_GB_20040101_0000_20260422_0807 data
+time_series_GB_20040101_0000_20260422_0807 <- read_csv("c:/Users/User/Downloads/time_series_GB_20040101-0000_20260422-0807.csv")
+data_clean <- time_series_GB_20040101_0000_20260422_0807 %>%
+  mutate(Time = ymd(Time))
+data_clean = janitor::clean_names(data_clean)
+data_clean$reform_uk = time_series_GB_20040101_0000_20260422_0807$`Reform UK`+time_series_GB_20040101_0000_20260422_0807$`UK Independence Party`
+```
+do a preliminary structural break  check on the immigration time series, we are going to be using pre defined dates though
+```{r}
+summary(strucchange::breakpoints(data_clean$immigration~1))
+```
+define break dummies using known immigration related topics such as brexit referendum
+```{r}
+data_clean <- data_clean %>% 
+  mutate(breakdBpl = ifelse(time > as.Date("2019-04-01"), 1, 0), # Reform UK founded small boatscrisis# 
+         breakpukip= ifelse(time>as.Date("2015-05-01"),1,0),    #Brexit #
+         breakpukipl= ifelse(time>as.Date("2012-01-01"),1,0))  # Hostile Enviroment Policy# 
+```
+pre define immigration and inflation break coefs
+
+```{r}
+data_clean = data_clean %>% mutate(Refbreakim = immigration*breakdBpl,
+Brexitbreakim = immigration*breakpukip,
+Hostilebreakim = immigration*breakpukipl)
+data_clean = data_clean %>% mutate(Refbreakinf = inflation*breakdBpl,
+Brexitbreakinf = inflation*breakpukip,
+Hostilebreakinf = inflation*breakpukipl)
+```
+define simple independent ols models
+
+```{r}
+breakmodel1im = lm(reform_uk~time+breakdBpl+breakpukip+breakpukipl+immigration+Refbreakim+Brexitbreakim+Hostilebreakim,data=data_clean)
+breakmodel2im = lm(conservative_party~time+breakdBpl+breakpukip+breakpukipl+immigration+Refbreakim+Brexitbreakim+Hostilebreakim,data=data_clean)
+breakmodel3im = lm(labour_party~time+breakdBpl+breakpukip+breakpukipl+immigration+Refbreakim+Brexitbreakim+Hostilebreakim,data=data_clean)
+breakmodel4im = lm(liberal_democrats~time+breakdBpl+breakpukip+breakpukipl+immigration+Refbreakim+Brexitbreakim+Hostilebreakim,data=data_clean)
+```
+define a Seemingly Unrelated Regressions model structure
+
+```{r}
+sur_model_imm = '
+#Outcome Regressions with breakpoints#
+
+reform_uk~time+breakdBpl+breakpukip+breakpukipl+ b1r*immigration + b2r*Refbreakim + b3r*Brexitbreakim + b4r*Hostilebreakim
+conservative_party~time+breakdBpl+breakpukip+breakpukipl + b1c*immigration + b2c*Refbreakim + b3c*Brexitbreakim + b4c*Hostilebreakim
+labour_party~time+breakdBpl+breakpukip+breakpukipl + b1l*immigration + b2l*Refbreakim + b3l*Brexitbreakim+ b4l*Hostilebreakim
+liberal_democrats~time+breakdBpl+breakpukip+breakpukipl + b1d*immigration + b2d*Refbreakim + b3d*Brexitbreakim + b4d*Hostilebreakim
+
+#The Covariance Structure of the Seemingly Unrelated Regressions#
+
+reform_uk~~conservative_party+labour_party+liberal_democrats
+conservative_party~~labour_party+liberal_democrats
+labour_party~~liberal_democrats
+
+#Contrasts#
+diff_ref_con := (b2r+b3r+b4r)-(b2c+b3c+b4c) #How much larger are slopes after breaks between Reform and Conservatives 
+diff_con_lab := (b2c+b3c+b4c)-(b2l+b3l+b4l) # How much larger are slopes between Conservatives and Labour
+diff_lab_lib := (b2l+b3l+b4l)-(b2d+b3d+b4d) # Between Labour and Lib Dem 
+diff_con_lib := (b2c+b3c+b4c)-(b2d+b3d+b4d) # Between Conservatives and Lib dems 
+diff_ref_main := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) # How different is the gap between reform and conservatives compared to conservatives and labour
+'
+```
+
+fit a SUR
+
+
+```{r}
+set.seed(123)
+fitsurimm = sem(sur_model_imm,data=data_clean,se="bootstrap",ncpus=12,bootstrap=2000,parallel="snow")
+summary(fitsurimm,ci=TRUE)
+```
