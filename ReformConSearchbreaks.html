@@ -160,8 +160,9 @@ Please cite as:
 lavaan is FREE software! Please report any bugs.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load time_series_GB_20040101_0000_20260422_0807 data</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>time_series_GB_20040101_0000_20260422_0807 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"c:/Users/User/Downloads/time_series_GB_20040101-0000_20260422-0807.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modelsummary)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load time_series_GB_20040101_0000_20260422_0807 data</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>time_series_GB_20040101_0000_20260422_0807 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"c:/Users/User/Downloads/time_series_GB_20040101-0000_20260422-0807.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 268 Columns: 9
 ── Column specification ────────────────────────────────────────────────────────
@@ -175,7 +176,8 @@ date (1): Time
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> time_series_GB_20040101_0000_20260422_0807 <span class="sc">%&gt;%</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Time =</span> <span class="fu">ymd</span>(Time))</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">=</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(data_clean)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>reform_uk <span class="ot">=</span> time_series_GB_20040101_0000_20260422_0807<span class="sc">$</span><span class="st">`</span><span class="at">Reform UK</span><span class="st">`</span><span class="sc">+</span>time_series_GB_20040101_0000_20260422_0807<span class="sc">$</span><span class="st">`</span><span class="at">UK Independence Party</span><span class="st">`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>reform_uk <span class="ot">=</span> time_series_GB_20040101_0000_20260422_0807<span class="sc">$</span><span class="st">`</span><span class="at">Reform UK</span><span class="st">`</span><span class="sc">+</span>time_series_GB_20040101_0000_20260422_0807<span class="sc">$</span><span class="st">`</span><span class="at">UK Independence Party</span><span class="st">`</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Combine Reform and UKip topics since reform wasn't founded until later on  to create a composite populist right indicator</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>do a preliminary structural break check on the immigration time series, we are going to be using pre defined dates though</p>
 <div class="cell">
@@ -232,48 +234,531 @@ BIC 1697 1617 1487 1483 1487 1491</code></pre>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="at">Brexitbreakinf =</span> inflation<span class="sc">*</span>breakpukip,</span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="at">Hostilebreakinf =</span> inflation<span class="sc">*</span>breakpukipl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>define simple independent ols models</p>
+<p>define simple independent ols models and check autocorrelations of residuals</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>breakmodel1im <span class="ot">=</span> <span class="fu">lm</span>(reform_uk<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>breakmodel2im <span class="ot">=</span> <span class="fu">lm</span>(conservative_party<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>breakmodel3im <span class="ot">=</span> <span class="fu">lm</span>(labour_party<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>breakmodel4im <span class="ot">=</span> <span class="fu">lm</span>(liberal_democrats<span class="sc">~</span>time<span class="sc">+</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sandwich)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmtest)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>breakmodel1im <span class="ot">=</span> <span class="fu">lm</span>(reform_uk<span class="sc">~</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(breakmodel1im<span class="sc">$</span>residuals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReformConSearchbreaks_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>breakmodel2im <span class="ot">=</span> <span class="fu">lm</span>(conservative_party<span class="sc">~</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(breakmodel2im<span class="sc">$</span>residuals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReformConSearchbreaks_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>breakmodel3im <span class="ot">=</span> <span class="fu">lm</span>(labour_party<span class="sc">~</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(breakmodel3im<span class="sc">$</span>residuals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReformConSearchbreaks_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>breakmodel4im <span class="ot">=</span> <span class="fu">lm</span>(liberal_democrats<span class="sc">~</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(breakmodel4im<span class="sc">$</span>residuals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReformConSearchbreaks_files/figure-html/unnamed-chunk-5-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>multivariatemodel <span class="ot">=</span> <span class="fu">lm</span>(<span class="fu">cbind</span>(reform_uk,conservative_party,labour_party,liberal_democrats)<span class="sc">~</span>breakdBpl<span class="sc">+</span>breakpukip<span class="sc">+</span>breakpukipl<span class="sc">+</span>immigration<span class="sc">+</span>Refbreakim<span class="sc">+</span>Brexitbreakim<span class="sc">+</span>Hostilebreakim,<span class="at">data=</span>data_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>define a Seemingly Unrelated Regressions model structure</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sur_model_imm <span class="ot">=</span> <span class="st">'</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="st">#Outcome Regressions with breakpoints#</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~time+breakdBpl+breakpukip+breakpukipl+ b1r*immigration + b2r*Refbreakim + b3r*Brexitbreakim + b4r*Hostilebreakim</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~time+breakdBpl+breakpukip+breakpukipl + b1c*immigration + b2c*Refbreakim + b3c*Brexitbreakim + b4c*Hostilebreakim</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~time+breakdBpl+breakpukip+breakpukipl + b1l*immigration + b2l*Refbreakim + b3l*Brexitbreakim+ b4l*Hostilebreakim</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="st">liberal_democrats~time+breakdBpl+breakpukip+breakpukipl + b1d*immigration + b2d*Refbreakim + b3d*Brexitbreakim + b4d*Hostilebreakim</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="st">#The Covariance Structure of the Seemingly Unrelated Regressions#</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~~conservative_party+labour_party+liberal_democrats</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~~labour_party+liberal_democrats</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~~liberal_democrats</span></span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="st">#Contrasts#</span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_con := (b2r+b3r+b4r)-(b2c+b3c+b4c) #How much larger are slopes after breaks between Reform and Conservatives </span></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lab := (b2c+b3c+b4c)-(b2l+b3l+b4l) # How much larger are slopes between Conservatives and Labour</span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="st">diff_lab_lib := (b2l+b3l+b4l)-(b2d+b3d+b4d) # Between Labour and Lib Dem </span></span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lib := (b2c+b3c+b4c)-(b2d+b3d+b4d) # Between Conservatives and Lib dems </span></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_main := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) # How different is the gap between reform and conservatives compared to conservatives and labour</span></span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sur_model_imm <span class="ot">=</span> <span class="st">'</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="st">#Outcome Regressions with breakpoints#</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~breakdBpl+breakpukip+breakpukipl+ b1r*immigration + b2r*Refbreakim + b3r*Brexitbreakim + b4r*Hostilebreakim</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~breakdBpl+breakpukip+breakpukipl + b1c*immigration + b2c*Refbreakim + b3c*Brexitbreakim + b4c*Hostilebreakim</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~breakdBpl+breakpukip+breakpukipl + b1l*immigration + b2l*Refbreakim + b3l*Brexitbreakim+ b4l*Hostilebreakim</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="st">liberal_democrats~breakdBpl+breakpukip+breakpukipl + b1d*immigration + b2d*Refbreakim + b3d*Brexitbreakim + b4d*Hostilebreakim</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="st">#The Covariance Structure of the Seemingly Unrelated Regressions#</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~~conservative_party+labour_party+liberal_democrats</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~~labour_party+liberal_democrats</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~~liberal_democrats</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="st">#Contrasts#</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_con_pre := b1r-b1c</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_main_pre := (b1r-b1c)-(b1c-b1l)</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_con := (b2r+b3r+b4r)-(b2c+b3c+b4c) #How much larger are slopes after breaks between Reform and Conservatives </span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lab := (b2c+b3c+b4c)-(b2l+b3l+b4l) # How much larger are slopes between Conservatives and Labour</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="st">diff_lab_lib := (b2l+b3l+b4l)-(b2d+b3d+b4d) # Between Labour and Lib Dem </span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lib := (b2c+b3c+b4c)-(b2d+b3d+b4d) # Between Conservatives and Lib dems </span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_main := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) # How different is the gap between reform and conservatives compared to conservatives and labour</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="st">PseudoDIDrefcon := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(b1r-b1c)</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="st">PseudoDIDrefmain := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) - ((b1r-b1c)-(b1c-b1l))</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>sur_model_inf <span class="ot">=</span> <span class="st">'</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~breakdBpl+breakpukip+breakpukipl + b1r*inflation + b2r*Refbreakinf + b3r*Brexitbreakinf + b4r*Hostilebreakim</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~breakdBpl+breakpukip+breakpukipl + b1c*inflation + b2c*Refbreakinf + b3c*Brexitbreakinf + b4c*Hostilebreakim</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~breakdBpl+breakpukip+breakpukipl + b1l*inflation + b2l*Refbreakinf + b3l*Brexitbreakinf + b4l*Hostilebreakim</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a><span class="st">liberal_democrats~breakdBpl+breakpukip+breakpukipl + b1d*inflation + b2d*Refbreakinf + b3d*Brexitbreakinf + b4d*Hostilebreakim</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="st">#The Covariance Structure of the Seemingly Unrelated Regressions#</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="st">reform_uk~~conservative_party+labour_party+liberal_democrats</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="st">conservative_party~~labour_party+liberal_democrats</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a><span class="st">labour_party~~liberal_democrats</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a><span class="st">#Contrasts#</span></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_con_pre := b1r-b1c</span></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_main_pre := (b1r-b1c)-(b1c-b1l)</span></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a><span class="st">PseudoDIDrefcon := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(b1r-b1c)</span></span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a><span class="st">PseudoDIDrefmain := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) - ((b1r-b1c)-(b1c-b1l))</span></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_con := (b2r+b3r+b4r)-(b2c+b3c+b4c) #How much larger are slopes after breaks between Reform and Conservatives </span></span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lab := (b2c+b3c+b4c)-(b2l+b3l+b4l) # How much larger are slopes between Conservatives and Labour</span></span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a><span class="st">diff_lab_lib := (b2l+b3l+b4l)-(b2d+b3d+b4d) # Between Labour and Lib Dem </span></span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a><span class="st">diff_con_lib := (b2c+b3c+b4c)-(b2d+b3d+b4d) # Between Conservatives and Lib dems </span></span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a><span class="st">diff_ref_main := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l))) # How different is the gap between reform and conservatives compared to conservatives and labour</span></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>fit a SUR</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fitsurimm <span class="ot">=</span> <span class="fu">sem</span>(sur_model_imm,<span class="at">data=</span>data_clean,<span class="at">se=</span><span class="st">"bootstrap"</span>,<span class="at">ncpus=</span><span class="dv">12</span>,<span class="at">bootstrap=</span><span class="dv">2000</span>,<span class="at">parallel=</span><span class="st">"snow"</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fitsurimm,<span class="at">ci=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>fitsurimm <span class="ot">=</span> <span class="fu">sem</span>(sur_model_imm,<span class="at">data=</span>data_clean,<span class="at">se=</span><span class="st">"bootstrap"</span>,<span class="at">ncpus=</span><span class="dv">12</span>,<span class="at">bootstrap=</span><span class="dv">2000</span>,<span class="at">parallel=</span><span class="st">"snow"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>fitsurinfl <span class="ot">=</span> <span class="fu">sem</span>(sur_model_inf,<span class="at">data=</span>data_clean,<span class="at">se=</span><span class="st">"bootstrap"</span>,<span class="at">ncpus=</span><span class="dv">12</span>,<span class="at">bootstrap=</span><span class="dv">2000</span>,<span class="at">parallel=</span><span class="st">"snow"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>modelsummary<span class="sc">::</span><span class="fu">datasummary</span>(reform_uk<span class="sc">+</span>conservative_party<span class="sc">+</span>immigration<span class="sc">+</span>labour_party<span class="sc">+</span>liberal_democrats<span class="sc">+</span>inflation<span class="sc">~</span>mean<span class="sc">+</span>sd<span class="sc">+</span>median<span class="sc">+</span>IQR,<span class="at">data=</span>data_clean,<span class="at">title=</span><span class="st">"Descriptive Stats"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_amn8s27jivk3qehpj8qa = TinyTable.createTableFunctions("tinytable_amn8s27jivk3qehpj8qa");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '6', j: 2 }, { i: '6', j: 3 }, { i: '6', j: 4 }, { i: '6', j: 5 } ], css_id: 'tinytable_css_6leviuilmmy2xatmj332',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '4', j: 5 }, { i: '5', j: 5 } ], css_id: 'tinytable_css_1b7g83imxxrdkqwk76rm',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_egk4jetxur411w0b0ztk',}, 
+          { positions: [ { i: '6', j: 1 } ], css_id: 'tinytable_css_ub4m5xzpdphdfo1jn62h',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 } ], css_id: 'tinytable_css_x7u7t8ybt93ym7ldhouf',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_lmr0qqvlwazccxyvo1js',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_amn8s27jivk3qehpj8qa.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_amn8s27jivk3qehpj8qa td.tinytable_css_6leviuilmmy2xatmj332, #tinytable_amn8s27jivk3qehpj8qa th.tinytable_css_6leviuilmmy2xatmj332 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: right }
+    #tinytable_amn8s27jivk3qehpj8qa td.tinytable_css_1b7g83imxxrdkqwk76rm, #tinytable_amn8s27jivk3qehpj8qa th.tinytable_css_1b7g83imxxrdkqwk76rm { text-align: right }
+    #tinytable_amn8s27jivk3qehpj8qa td.tinytable_css_egk4jetxur411w0b0ztk, #tinytable_amn8s27jivk3qehpj8qa th.tinytable_css_egk4jetxur411w0b0ztk {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: right }
+    #tinytable_amn8s27jivk3qehpj8qa td.tinytable_css_ub4m5xzpdphdfo1jn62h, #tinytable_amn8s27jivk3qehpj8qa th.tinytable_css_ub4m5xzpdphdfo1jn62h {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_amn8s27jivk3qehpj8qa td.tinytable_css_x7u7t8ybt93ym7ldhouf, #tinytable_amn8s27jivk3qehpj8qa th.tinytable_css_x7u7t8ybt93ym7ldhouf { text-align: left }
+    #tinytable_amn8s27jivk3qehpj8qa td.tinytable_css_lmr0qqvlwazccxyvo1js, #tinytable_amn8s27jivk3qehpj8qa th.tinytable_css_lmr0qqvlwazccxyvo1js {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_amn8s27jivk3qehpj8qa" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Descriptive Stats</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">mean</th>
+                <th scope="col" data-row="0" data-col="3">sd</th>
+                <th scope="col" data-row="0" data-col="4">median</th>
+                <th scope="col" data-row="0" data-col="5">IQR</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">reform_uk</td>
+                  <td data-row="1" data-col="2">4.00</td>
+                  <td data-row="1" data-col="3">7.07</td>
+                  <td data-row="1" data-col="4">1.00</td>
+                  <td data-row="1" data-col="5">3.00</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1">conservative_party</td>
+                  <td data-row="2" data-col="2">5.35</td>
+                  <td data-row="2" data-col="3">6.86</td>
+                  <td data-row="2" data-col="4">4.00</td>
+                  <td data-row="2" data-col="5">2.00</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">immigration</td>
+                  <td data-row="3" data-col="2">15.96</td>
+                  <td data-row="3" data-col="3">5.63</td>
+                  <td data-row="3" data-col="4">14.00</td>
+                  <td data-row="3" data-col="5">7.00</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1">labour_party</td>
+                  <td data-row="4" data-col="2">8.55</td>
+                  <td data-row="4" data-col="3">11.31</td>
+                  <td data-row="4" data-col="4">6.00</td>
+                  <td data-row="4" data-col="5">5.25</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">liberal_democrats</td>
+                  <td data-row="5" data-col="2">2.63</td>
+                  <td data-row="5" data-col="3">3.45</td>
+                  <td data-row="5" data-col="4">2.00</td>
+                  <td data-row="5" data-col="5">1.00</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1">inflation</td>
+                  <td data-row="6" data-col="2">6.74</td>
+                  <td data-row="6" data-col="3">3.36</td>
+                  <td data-row="6" data-col="4">5.00</td>
+                  <td data-row="6" data-col="5">2.00</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>modelsummary<span class="sc">::</span><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">"Immigration interest"</span><span class="ot">=</span>fitsurimm,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">"Inflation Interest"</span><span class="ot">=</span>fitsurinfl),<span class="at">coef_map=</span><span class="fu">c</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"diff_ref_con := (b2r+b3r+b4r)-(b2c+b3c+b4c)"</span><span class="ot">=</span><span class="st">"Refom vs Conservatives"</span>,                                   </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a> <span class="st">"diff_con_lab := (b2c+b3c+b4c)-(b2l+b3l+b4l)"</span><span class="ot">=</span><span class="st">"Conservatives vs Labour"</span>,                                   </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a> <span class="st">"diff_lab_lib := (b2l+b3l+b4l)-(b2d+b3d+b4d)"</span><span class="ot">=</span><span class="st">"Labour vs Libdems"</span>,                                   </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a> <span class="st">"diff_con_lib := (b2c+b3c+b4c)-(b2d+b3d+b4d)"</span><span class="ot">=</span><span class="st">"Conservatives vs Libdems"</span>,                                   </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a> <span class="st">"diff_ref_main := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l)))"</span><span class="ot">=</span> <span class="st">"Reform Conservative Gap vs Conservative Labour Gap"</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="st">"PseudoDIDrefcon := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(b1r-b1c)"</span><span class="ot">=</span><span class="st">"SlopeDiDrefcon=difference_in_slopes(After-Before)"</span>,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="st">"PseudoDIDrefmain := ((b2r+b3r+b4r)-(b2c+b3c+b4c))-(((b2c+b3c+b4c)-(b2l+b3l+b4l)))-((b1r-b1c)-(b1c-b1l))"</span><span class="ot">=</span><span class="st">"SlopeDDDrefmain=difference_in_a_difference_of_slopes(After-Before)"</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="st">"diff_ref_con_pre := b1r-b1c"</span> <span class="ot">=</span> <span class="st">"Difference in slopes pre break"</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="st">"diff_ref_main_pre := (b1r-b1c)-(b1c-b1l)"</span><span class="ot">=</span> <span class="st">"Difference in difference Reform-Con - Con-Lab"</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>),<span class="at">title=</span><span class="st">"How differently did the political shocks affect parties"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_6dsycwk93rb0tpms92wi = TinyTable.createTableFunctions("tinytable_6dsycwk93rb0tpms92wi");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '21', j: 2 }, { i: '21', j: 3 } ], css_id: 'tinytable_css_ikoutsbvmn6qz038c1h4',}, 
+          { positions: [ { i: '18', j: 2 }, { i: '18', j: 3 } ], css_id: 'tinytable_css_w6ffju7qlv7vdy91lyzp',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 } ], css_id: 'tinytable_css_r9cvc4tivs6nc8yp09ln',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_09nwj1zw7zby425bikiv',}, 
+          { positions: [ { i: '21', j: 1 } ], css_id: 'tinytable_css_dmnwihjr7anhm5ejcc84',}, 
+          { positions: [ { i: '18', j: 1 } ], css_id: 'tinytable_css_2etmgyr8qfoyp9fxfpl4',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 } ], css_id: 'tinytable_css_phr3wdvat8bahvs284jd',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_94yryumx69ptiiaehcck',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_6dsycwk93rb0tpms92wi.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_ikoutsbvmn6qz038c1h4, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_ikoutsbvmn6qz038c1h4 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_w6ffju7qlv7vdy91lyzp, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_w6ffju7qlv7vdy91lyzp {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_r9cvc4tivs6nc8yp09ln, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_r9cvc4tivs6nc8yp09ln { text-align: center }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_09nwj1zw7zby425bikiv, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_09nwj1zw7zby425bikiv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_dmnwihjr7anhm5ejcc84, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_dmnwihjr7anhm5ejcc84 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_2etmgyr8qfoyp9fxfpl4, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_2etmgyr8qfoyp9fxfpl4 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_phr3wdvat8bahvs284jd, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_phr3wdvat8bahvs284jd { text-align: left }
+    #tinytable_6dsycwk93rb0tpms92wi td.tinytable_css_94yryumx69ptiiaehcck, #tinytable_6dsycwk93rb0tpms92wi th.tinytable_css_94yryumx69ptiiaehcck {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_6dsycwk93rb0tpms92wi" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>How differently did the political shocks affect parties</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Immigration interest</th>
+                <th scope="col" data-row="0" data-col="3">Inflation Interest</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">Refom vs Conservatives</td>
+                  <td data-row="1" data-col="2">0.945</td>
+                  <td data-row="1" data-col="3">0.693</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.126)</td>
+                  <td data-row="2" data-col="3">(0.384)</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">Conservatives vs Labour</td>
+                  <td data-row="3" data-col="2">-0.330</td>
+                  <td data-row="3" data-col="3">0.179</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.149)</td>
+                  <td data-row="4" data-col="3">(0.202)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Labour vs Libdems</td>
+                  <td data-row="5" data-col="2">0.044</td>
+                  <td data-row="5" data-col="3">-0.635</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.157)</td>
+                  <td data-row="6" data-col="3">(0.288)</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">Conservatives vs Libdems</td>
+                  <td data-row="7" data-col="2">-0.286</td>
+                  <td data-row="7" data-col="3">-0.455</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.059)</td>
+                  <td data-row="8" data-col="3">(0.194)</td>
+                </tr>
+                <tr>
+                  <td data-row="9" data-col="1">Reform Conservative Gap vs Conservative Labour Gap</td>
+                  <td data-row="9" data-col="2">1.275</td>
+                  <td data-row="9" data-col="3">0.513</td>
+                </tr>
+                <tr>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(0.208)</td>
+                  <td data-row="10" data-col="3">(0.419)</td>
+                </tr>
+                <tr>
+                  <td data-row="11" data-col="1">SlopeDiDrefcon=difference_in_slopes(After-Before)</td>
+                  <td data-row="11" data-col="2">1.138</td>
+                  <td data-row="11" data-col="3">0.719</td>
+                </tr>
+                <tr>
+                  <td data-row="12" data-col="1"></td>
+                  <td data-row="12" data-col="2">(0.189)</td>
+                  <td data-row="12" data-col="3">(0.661)</td>
+                </tr>
+                <tr>
+                  <td data-row="13" data-col="1">SlopeDDDrefmain=difference_in_a_difference_of_slopes(After-Before)</td>
+                  <td data-row="13" data-col="2">1.364</td>
+                  <td data-row="13" data-col="3">0.381</td>
+                </tr>
+                <tr>
+                  <td data-row="14" data-col="1"></td>
+                  <td data-row="14" data-col="2">(0.262)</td>
+                  <td data-row="14" data-col="3">(0.707)</td>
+                </tr>
+                <tr>
+                  <td data-row="15" data-col="1">Difference in slopes pre break</td>
+                  <td data-row="15" data-col="2">-0.193</td>
+                  <td data-row="15" data-col="3">-0.027</td>
+                </tr>
+                <tr>
+                  <td data-row="16" data-col="1"></td>
+                  <td data-row="16" data-col="2">(0.081)</td>
+                  <td data-row="16" data-col="3">(0.311)</td>
+                </tr>
+                <tr>
+                  <td data-row="17" data-col="1">Difference in difference Reform-Con - Con-Lab</td>
+                  <td data-row="17" data-col="2">-0.089</td>
+                  <td data-row="17" data-col="3">0.132</td>
+                </tr>
+                <tr>
+                  <td data-row="18" data-col="1"></td>
+                  <td data-row="18" data-col="2">(0.091)</td>
+                  <td data-row="18" data-col="3">(0.329)</td>
+                </tr>
+                <tr>
+                  <td data-row="19" data-col="1">Num.Obs.</td>
+                  <td data-row="19" data-col="2">268</td>
+                  <td data-row="19" data-col="3">268</td>
+                </tr>
+                <tr>
+                  <td data-row="20" data-col="1">AIC</td>
+                  <td data-row="20" data-col="2">6240.8</td>
+                  <td data-row="20" data-col="3">6313.7</td>
+                </tr>
+                <tr>
+                  <td data-row="21" data-col="1">BIC</td>
+                  <td data-row="21" data-col="2">6377.2</td>
+                  <td data-row="21" data-col="3">6450.1</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>modelsummary<span class="sc">::</span><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">"Immigration interest"</span><span class="ot">=</span>fitsurimm,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="st">"Inflation Interest"</span><span class="ot">=</span>fitsurinfl),<span class="at">coef_map=</span><span class="fu">c</span>( <span class="st">"reform_uk ~~ conservative_party"</span><span class="ot">=</span><span class="st">"cov(reform,conservatives)"</span>,                                               </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a> <span class="st">"reform_uk ~~ labour_party"</span><span class="ot">=</span><span class="st">"cov(reform,labour)"</span>,                                                     </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a> <span class="st">"reform_uk ~~ liberal_democrats"</span><span class="ot">=</span><span class="st">"cov(reform,libdems)"</span>,                                                </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="st">"conservative_party ~~ labour_party"</span><span class="ot">=</span><span class="st">"cov(conservatives,labour)"</span>,                                            </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="st">"conservative_party ~~ liberal_democrats"</span><span class="ot">=</span><span class="st">"cov(conservatives,libdems)"</span>,                                       </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="st">"labour_party ~~ liberal_democrats"</span><span class="ot">=</span><span class="st">"cov(labour,libdems)"</span>,                                             </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a> <span class="st">"reform_uk ~~ reform_uk"</span><span class="ot">=</span><span class="st">"var(reform)"</span>,                                                        </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="st">"conservative_party ~~ conservative_party"</span><span class="ot">=</span><span class="st">"var(conservatives)"</span>,                                      </span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="st">"labour_party ~~ labour_party"</span><span class="ot">=</span><span class="st">"var(labour)"</span>,                                                  </span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="st">"liberal_democrats ~~ liberal_democrats"</span><span class="ot">=</span><span class="st">"var(libdems)"</span> </span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>),<span class="at">title=</span><span class="st">"residual covariances"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_nv3syi8xbf8kye3i6lhc = TinyTable.createTableFunctions("tinytable_nv3syi8xbf8kye3i6lhc");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '15', j: 2 }, { i: '15', j: 3 } ], css_id: 'tinytable_css_cr3n6t4r7sn7s15jyu6u',}, 
+          { positions: [ { i: '12', j: 2 }, { i: '12', j: 3 } ], css_id: 'tinytable_css_zta1aut0z3wp56rhyt83',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 } ], css_id: 'tinytable_css_aj23d1d3764megnlpr37',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_upglmokiwvewpnkk6iy4',}, 
+          { positions: [ { i: '15', j: 1 } ], css_id: 'tinytable_css_f7pzd2goxlvcgu25hetp',}, 
+          { positions: [ { i: '12', j: 1 } ], css_id: 'tinytable_css_yu32wujret6uscukpxfx',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 } ], css_id: 'tinytable_css_msnw3v69rm59qpy9nrxz',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_zkaydom2rxx88wq9wjnf',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_nv3syi8xbf8kye3i6lhc.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_cr3n6t4r7sn7s15jyu6u, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_cr3n6t4r7sn7s15jyu6u {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_zta1aut0z3wp56rhyt83, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_zta1aut0z3wp56rhyt83 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_aj23d1d3764megnlpr37, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_aj23d1d3764megnlpr37 { text-align: center }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_upglmokiwvewpnkk6iy4, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_upglmokiwvewpnkk6iy4 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_f7pzd2goxlvcgu25hetp, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_f7pzd2goxlvcgu25hetp {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_yu32wujret6uscukpxfx, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_yu32wujret6uscukpxfx {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_msnw3v69rm59qpy9nrxz, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_msnw3v69rm59qpy9nrxz { text-align: left }
+    #tinytable_nv3syi8xbf8kye3i6lhc td.tinytable_css_zkaydom2rxx88wq9wjnf, #tinytable_nv3syi8xbf8kye3i6lhc th.tinytable_css_zkaydom2rxx88wq9wjnf {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_nv3syi8xbf8kye3i6lhc" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>residual covariances</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Immigration interest</th>
+                <th scope="col" data-row="0" data-col="3">Inflation Interest</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">cov(reform,conservatives)</td>
+                  <td data-row="1" data-col="2">10.139</td>
+                  <td data-row="1" data-col="3">14.322</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(2.771)</td>
+                  <td data-row="2" data-col="3">(3.937)</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">cov(reform,labour)</td>
+                  <td data-row="3" data-col="2">22.883</td>
+                  <td data-row="3" data-col="3">25.636</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(9.491)</td>
+                  <td data-row="4" data-col="3">(9.210)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">cov(reform,libdems)</td>
+                  <td data-row="5" data-col="2">8.413</td>
+                  <td data-row="5" data-col="3">9.928</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(2.432)</td>
+                  <td data-row="6" data-col="3">(2.557)</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">cov(conservatives,labour)</td>
+                  <td data-row="7" data-col="2">54.509</td>
+                  <td data-row="7" data-col="3">57.104</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(22.075)</td>
+                  <td data-row="8" data-col="3">(21.673)</td>
+                </tr>
+                <tr>
+                  <td data-row="9" data-col="1">cov(conservatives,libdems)</td>
+                  <td data-row="9" data-col="2">17.113</td>
+                  <td data-row="9" data-col="3">18.195</td>
+                </tr>
+                <tr>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(5.272)</td>
+                  <td data-row="10" data-col="3">(5.258)</td>
+                </tr>
+                <tr>
+                  <td data-row="11" data-col="1">cov(labour,libdems)</td>
+                  <td data-row="11" data-col="2">25.586</td>
+                  <td data-row="11" data-col="3">26.228</td>
+                </tr>
+                <tr>
+                  <td data-row="12" data-col="1"></td>
+                  <td data-row="12" data-col="2">(7.990)</td>
+                  <td data-row="12" data-col="3">(7.630)</td>
+                </tr>
+                <tr>
+                  <td data-row="13" data-col="1">Num.Obs.</td>
+                  <td data-row="13" data-col="2">268</td>
+                  <td data-row="13" data-col="3">268</td>
+                </tr>
+                <tr>
+                  <td data-row="14" data-col="1">AIC</td>
+                  <td data-row="14" data-col="2">6240.8</td>
+                  <td data-row="14" data-col="3">6313.7</td>
+                </tr>
+                <tr>
+                  <td data-row="15" data-col="1">BIC</td>
+                  <td data-row="15" data-col="2">6377.2</td>
+                  <td data-row="15" data-col="3">6450.1</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+<p>APPENDIX:Full model summaries</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fitsurimm,<span class="at">ci=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lavaan 0.7-2 ended normally after 182 iterations
+<pre><code>lavaan 0.7-2 ended normally after 148 iterations
 
   Estimator                                         ML
   Optimization method                           NLMINB
-  Number of model parameters                        42
+  Number of model parameters                        38
 
   Number of observations                           268
 
@@ -289,128 +774,157 @@ Parameter Estimates:
   Number of successful bootstrap draws            2000
 
 Regressions:
-                       Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
-  reform_uk ~                                                            
-    time                     0.001    0.001    0.476    0.634      -0.002
-    brekdBpl                -4.136    2.824   -1.465    0.143     -10.902
-    breakpkp                53.399   16.177    3.301    0.001      17.240
-    brekpkpl               -53.999   15.756   -3.427    0.001     -89.037
-    immigrtn (b1r)           0.140    0.180    0.778    0.436      -0.230
-    Refbrekm (b2r)           0.243    0.229    1.063    0.288      -0.122
-    Brxtbrkm (b3r)          -4.885    1.391   -3.512    0.000      -7.982
-    Hstlbrkm (b4r)           4.992    1.402    3.560    0.000       1.753
-  conservative_party ~                                                   
-    time                    -0.000    0.001   -0.135    0.893      -0.003
-    brekdBpl                 5.685    4.113    1.382    0.167       0.628
-    breakpkp                34.143   15.098    2.261    0.024      -2.174
-    brekpkpl               -29.842   13.881   -2.150    0.032     -44.936
-    immigrtn (b1c)           0.220    0.240    0.915    0.360      -0.243
-    Refbrekm (b2c)          -0.355    0.404   -0.878    0.380      -1.466
-    Brxtbrkm (b3c)          -2.547    1.228   -2.074    0.038      -3.824
-    Hstlbrkm (b4c)           2.479    1.197    2.071    0.038      -0.331
-  labour_party ~                                                         
-    time                    -0.000    0.002   -0.253    0.800      -0.004
-    brekdBpl                 9.223    5.820    1.585    0.113      -0.145
-    breakpkp                33.963   15.983    2.125    0.034      -5.375
-    brekpkpl               -31.959   13.817   -2.313    0.021     -47.679
-    immigrtn (b1l)           0.272    0.336    0.809    0.418      -0.424
-    Refbrekm (b2l)          -0.582    0.589   -0.989    0.323      -2.104
-    Brxtbrkm (b3l)          -2.229    1.263   -1.765    0.078      -3.686
-    Hstlbrkm (b4l)           2.796    1.226    2.281    0.023      -0.207
-  liberal_democrats ~                                                    
-    time                     0.000    0.001    0.091    0.927      -0.001
-    brekdBpl                 2.090    1.567    1.334    0.182      -0.464
-    breakpkp                12.953    5.317    2.436    0.015      -0.776
-    brekpkpl               -12.129    4.694   -2.584    0.010     -17.531
-    immigrtn (b1d)           0.156    0.152    1.022    0.307      -0.131
-    Refbrekm (b2d)          -0.140    0.160   -0.877    0.381      -0.563
-    Brxtbrkm (b3d)          -1.036    0.403   -2.569    0.010      -1.460
-    Hstlbrkm (b4d)           0.979    0.422    2.317    0.020      -0.126
- ci.upper   
-            
-       0.003
-       0.320
-      88.906
-     -16.980
-       0.482
-       0.787
-      -1.660
-       8.106
-            
-       0.002
-      17.789
-      51.603
-       2.615
-       0.707
-       0.212
-       0.410
-       3.815
-            
-       0.003
-      23.580
-      54.055
-       2.420
-       0.921
-       0.350
-       0.894
-       4.277
-            
-       0.002
-       6.119
-      19.469
-       0.128
-       0.485
-       0.096
-       0.054
-       1.513
+                       Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+  reform_uk ~                                                               
+    brekdBpl             -4.239    2.924   -1.450    0.147  -11.137    0.406
+    breakpkp             55.215   15.724    3.511    0.000   18.188   90.513
+    brekpkpl            -55.235   15.516   -3.560    0.000  -89.346  -18.347
+    immigrtn (b1r)        0.055    0.041    1.356    0.175   -0.019    0.144
+    Refbrekm (b2r)        0.319    0.196    1.624    0.104    0.043    0.810
+    Brxtbrkm (b3r)       -4.975    1.377   -3.612    0.000   -8.057   -1.770
+    Hstlbrkm (b4r)        5.135    1.365    3.763    0.000    1.875    8.165
+  conservative_party ~                                                      
+    brekdBpl              5.720    4.120    1.388    0.165    0.547   17.556
+    breakpkp             33.530   14.037    2.389    0.017    0.383   47.749
+    brekpkpl            -29.425   13.414   -2.194    0.028  -43.421    1.366
+    immigrtn (b1c)        0.248    0.096    2.589    0.010    0.087    0.459
+    Refbrekm (b2c)       -0.380    0.350   -1.086    0.277   -1.418    0.005
+    Brxtbrkm (b3c)       -2.517    1.187   -2.119    0.034   -3.710    0.349
+    Hstlbrkm (b4c)        2.431    1.125    2.161    0.031   -0.148    3.547
+  labour_party ~                                                            
+    brekdBpl              9.321    5.866    1.589    0.112    0.050   24.200
+    breakpkp             32.247   13.831    2.332    0.020   -3.646   46.506
+    brekpkpl            -30.790   12.824   -2.401    0.016  -43.474    1.267
+    immigrtn (b1l)        0.352    0.091    3.876    0.000    0.200    0.554
+    Refbrekm (b2l)       -0.653    0.513   -1.273    0.203   -2.006    0.128
+    Brxtbrkm (b3l)       -2.143    1.182   -1.814    0.070   -3.343    0.943
+    Hstlbrkm (b4l)        2.660    1.079    2.466    0.014   -0.058    3.688
+  liberal_democrats ~                                                       
+    brekdBpl              2.076    1.569    1.323    0.186   -0.454    6.170
+    breakpkp             13.202    4.380    3.014    0.003    1.232   17.334
+    brekpkpl            -12.299    4.319   -2.847    0.004  -16.980   -0.773
+    immigrtn (b1d)        0.144    0.076    1.884    0.060    0.013    0.310
+    Refbrekm (b2d)       -0.130    0.116   -1.123    0.261   -0.472    0.012
+    Brxtbrkm (b3d)       -1.049    0.369   -2.840    0.005   -1.377   -0.048
+    Hstlbrkm (b4d)        0.998    0.354    2.818    0.005    0.041    1.346
 
 Covariances:
-                        Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
- .reform_uk ~~                                                            
-   .conservtv_prty           10.150    2.782    3.649    0.000       4.560
-   .labour_party             22.916    9.469    2.420    0.016       6.714
-   .liberal_dmcrts            8.408    2.416    3.480    0.001       3.795
- .conservative_party ~~                                                   
-   .labour_party             54.498   21.975    2.480    0.013      16.277
-   .liberal_dmcrts           17.114    5.251    3.259    0.001       7.034
- .labour_party ~~                                                         
-   .liberal_dmcrts           25.590    7.961    3.214    0.001      10.257
- ci.upper   
-            
-      15.658
-      43.474
-      13.201
-            
-      99.905
-      27.144
-            
-      41.803
+                        Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+ .reform_uk ~~                                                               
+   .conservtv_prty        10.139    2.771    3.658    0.000    4.626   15.701
+   .labour_party          22.883    9.491    2.411    0.016    6.756   43.141
+   .liberal_dmcrts         8.413    2.432    3.459    0.001    3.822   13.318
+ .conservative_party ~~                                                      
+   .labour_party          54.509   22.075    2.469    0.014   16.339  100.240
+   .liberal_dmcrts        17.113    5.272    3.246    0.001    7.066   27.295
+ .labour_party ~~                                                            
+   .liberal_dmcrts        25.586    7.990    3.202    0.001   10.411   41.840
 
 Variances:
-                   Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
-   .reform_uk           28.855   10.119    2.852    0.004      10.595
-   .conservtv_prty      41.656   15.731    2.648    0.008      14.291
-   .labour_party       107.269   40.737    2.633    0.008      33.994
-   .liberal_dmcrts      11.008    2.982    3.691    0.000       5.185
- ci.upper   
-      49.269
-      72.965
-     190.023
-      17.074
+                   Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+   .reform_uk        28.890   10.160    2.843    0.004   10.816   49.910
+   .conservtv_prty   41.660   15.795    2.638    0.008   14.315   73.244
+   .labour_party    107.300   40.863    2.626    0.009   34.212  190.765
+   .liberal_dmcrts   11.009    3.007    3.661    0.000    5.236   17.192
 
 Defined Parameters:
-                   Estimate     Std.Err  z-value  P(&gt;|z|) ci.lower   
-    diff_ref_con         0.773    0.339    2.280    0.023       0.126
-    diff_con_lab        -0.408    0.281   -1.452    0.146      -1.002
-    diff_lab_lib         0.183    0.337    0.543    0.587      -0.409
-    diff_con_lib        -0.225    0.184   -1.225    0.221      -0.578
-    diff_ref_main        1.181    0.456    2.590    0.010       0.333
- ci.upper   
-       1.479
-       0.114
-       0.891
-       0.153
-       2.099</code></pre>
+                   Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+    diff_ref_cn_pr   -0.193    0.081   -2.378    0.017   -0.369   -0.044
+    diff_ref_mn_pr   -0.089    0.091   -0.975    0.330   -0.274    0.080
+    diff_ref_con      0.945    0.126    7.514    0.000    0.714    1.208
+    diff_con_lab     -0.330    0.149   -2.208    0.027   -0.713   -0.117
+    diff_lab_lib      0.044    0.157    0.277    0.781   -0.194    0.433
+    diff_con_lib     -0.286    0.059   -4.864    0.000   -0.413   -0.182
+    diff_ref_main     1.275    0.208    6.138    0.000    0.946    1.766
+    PseudoDIDrefcn    1.138    0.189    6.012    0.000    0.792    1.534
+    PseudoDIDrefmn    1.364    0.262    5.207    0.000    0.910    1.952</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fitsurinfl,<span class="at">ci=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.7-2 ended normally after 49 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        38
+
+  Number of observations                           268
+
+Model Test User Model:
+                                                      
+  Test statistic                                 0.000
+  Degrees of freedom                                 0
+
+Parameter Estimates:
+
+  Standard errors                            Bootstrap
+  Number of requested bootstrap draws             2000
+  Number of successful bootstrap draws            2000
+
+Regressions:
+                       Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+  reform_uk ~                                                               
+    brekdBpl              3.274    2.478    1.321    0.186   -1.060    8.664
+    breakpkp             -3.421    2.265   -1.510    0.131   -8.182    0.577
+    brekpkpl             -0.248    2.036   -0.122    0.903   -4.043    3.997
+    inflatin (b1r)        0.600    0.284    2.112    0.035    0.110    1.228
+    Refbrknf (b2r)       -0.361    0.371   -0.971    0.331   -1.212    0.261
+    Brxtbrkn (b3r)       -0.624    0.445   -1.402    0.161   -1.477    0.306
+    Hstlbrkm (b4r)        0.687    0.107    6.429    0.000    0.503    0.917
+  conservative_party ~                                                      
+    brekdBpl              9.580    3.838    2.496    0.013    2.769   18.061
+    breakpkp             -0.590    2.847   -0.207    0.836   -6.601    4.854
+    brekpkpl              0.343    1.075    0.319    0.750   -1.877    2.377
+    inflatin (b1c)        0.627    0.295    2.122    0.034    0.134    1.305
+    Refbrknf (b2c)       -1.634    0.724   -2.258    0.024   -3.420   -0.549
+    Brxtbrkn (b3c)        0.702    0.736    0.953    0.341   -0.497    2.502
+    Hstlbrkm (b4c)       -0.058    0.087   -0.667    0.505   -0.209    0.134
+  labour_party ~                                                            
+    brekdBpl              4.148    6.344    0.654    0.513   -7.434   18.252
+    breakpkp             14.542    4.577    3.178    0.001    4.700   22.837
+    brekpkpl             -5.795    2.434   -2.381    0.017  -11.565   -2.302
+    inflatin (b1l)        0.785    0.286    2.748    0.006    0.306    1.435
+    Refbrknf (b2l)        0.084    1.101    0.076    0.939   -2.408    1.919
+    Brxtbrkn (b3l)       -1.778    1.086   -1.638    0.101   -3.529    0.850
+    Hstlbrkm (b4l)        0.525    0.194    2.708    0.007    0.255    1.009
+  liberal_democrats ~                                                       
+    brekdBpl              3.582    1.556    2.303    0.021    0.819    6.776
+    breakpkp              0.766    1.351    0.567    0.571   -1.911    3.437
+    brekpkpl             -1.070    0.653   -1.639    0.101   -2.439    0.050
+    inflatin (b1d)        0.359    0.225    1.596    0.110   -0.037    0.852
+    Refbrknf (b2d)       -0.483    0.250   -1.934    0.053   -1.081   -0.099
+    Brxtbrkn (b3d)       -0.099    0.323   -0.306    0.760   -0.714    0.608
+    Hstlbrkm (b4d)        0.047    0.038    1.238    0.216   -0.012    0.135
+
+Covariances:
+                        Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+ .reform_uk ~~                                                               
+   .conservtv_prty        14.322    3.937    3.637    0.000    6.824   21.966
+   .labour_party          25.636    9.210    2.783    0.005    9.781   44.536
+   .liberal_dmcrts         9.928    2.557    3.883    0.000    5.015   15.098
+ .conservative_party ~~                                                      
+   .labour_party          57.104   21.673    2.635    0.008   19.262  101.905
+   .liberal_dmcrts        18.195    5.258    3.460    0.001    8.161   28.474
+ .labour_party ~~                                                            
+   .liberal_dmcrts        26.228    7.630    3.438    0.001   11.668   41.496
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+   .reform_uk        36.407   12.912    2.820    0.005   14.132   63.713
+   .conservtv_prty   44.450   15.866    2.802    0.005   16.503   76.355
+   .labour_party    107.379   39.123    2.745    0.006   36.833  185.184
+   .liberal_dmcrts   11.378    2.973    3.827    0.000    5.686   17.582
+
+Defined Parameters:
+                   Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+    diff_ref_cn_pr   -0.027    0.311   -0.086    0.932   -0.653    0.612
+    diff_ref_mn_pr    0.132    0.329    0.401    0.688   -0.540    0.786
+    PseudoDIDrefcn    0.719    0.661    1.089    0.276   -0.605    2.026
+    PseudoDIDrefmn    0.381    0.707    0.539    0.590   -0.993    1.812
+    diff_ref_con      0.693    0.384    1.805    0.071   -0.073    1.451
+    diff_con_lab      0.179    0.202    0.888    0.375   -0.225    0.580
+    diff_lab_lib     -0.635    0.288   -2.202    0.028   -1.245   -0.111
+    diff_con_lib     -0.455    0.194   -2.350    0.019   -0.851   -0.104
+    diff_ref_main     0.513    0.419    1.224    0.221   -0.303    1.355</code></pre>
 </div>
 </div>
 
