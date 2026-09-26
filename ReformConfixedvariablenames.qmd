@@ -69,6 +69,10 @@ breakmodel4im = lm(liberal_democrats~break2019+break2015+break2012+immigration+R
 acf(breakmodel4im$residuals)
 ```
 
+the DAG at hand visualizing set of conditional independence relations can be visualised this way:
+
+/![](dagitty-model.png){width="733"}
+
 define a Seemingly Unrelated Regressions model structure
 
 ```{r}
@@ -127,7 +131,9 @@ set.seed(123)
 fitsurimm = sem(sur_model_imm,data=data_clean,se="bootstrap",ncpus=12,bootstrap=2000,parallel="snow")
 fitsurinfl = sem(sur_model_inf,data=data_clean,se="bootstrap",ncpus=12,bootstrap=2000,parallel="snow")
 ```
-summarise results 
+
+summarise results
+
 ```{r}
 modelsummary::datasummary(reform_uk+conservative_party+immigration+labour_party+liberal_democrats+inflation~mean+sd+median+IQR,data=data_clean,title="Descriptive Stats")
 modelsummary::modelsummary(list("Immigration interest"=fitsurimm,
